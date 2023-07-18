@@ -1,0 +1,34 @@
+{% import "_macros.html" as macro %}
+{% extends "_layout.html" %}
+
+{% block title %}
+{{ super() }}: Book - {{ flat_book.title }}
+{% endblock %}
+
+
+{% block main %}
+<article class="flat-book-display-panel">
+  <div class="flat-book-display-media card">
+    <figure>
+      <a href="/books/{{ flat_book.id }}">
+        <img src="/books/{{ flat_book.id }}/cover" alt="{{ flat_book.title }} Cover" />
+      </a>
+    </figure>
+    <section>
+      <a class="button" href="/books/{{ flat_book.id }}/read">Read Online</a>
+    </section>
+  </div>
+  <div class="flat-book-display-body card">
+    <header class="flat-book-display-header">
+      <h2>{{ flat_book.title }}</h2>
+    </header>
+    <section class="flat-book-display-download-list">{{ macro::flat_book_downloads_list(flat_book = flat_book) }}</section>
+    {% if flat_book.authors %}<section class="flat-book-display-authors-list">{{ macro::flat_book_authors_list(flat_book = flat_book) }}</section>{% endif %}
+    {% if flat_book.series %}<section class="flat-book-display-series-list">{{ macro::flat_book_series_list(flat_book = flat_book) }}</section>{% endif %}
+    <hr />
+    <section class="flat-book-display-description">
+      {{ flat_book.description | default(value="") | safe }}
+    </section>
+  </div>
+</article>
+{% endblock %}

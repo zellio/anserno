@@ -1,0 +1,77 @@
+---
+name: Build Test Push
+
+on:
+  push:
+    branches:
+      - '*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v3
+      -
+        name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::648729606310:role/ecr-xzje-anserno-uploader
+          role-session-name: ecr-uploader
+          aws-region: us-east-1
+      -
+        name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      -
+        name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: xzje/anserno
+          IMAGE_TAG: ${{ github.sha }}
+          DOCKER_BUILDKIT: 1
+        run: |
+          docker build \
+              --compress \
+              --file="$(pwd)/container/Dockerfile" \
+              --cache-from="$REGISTRY/$REPOSITORY:${IMAGE_TAG:12}" \
+              --cache-from="$REGISTRY/$REPOSITORY:${GITHUB_REF##*/}" \
+              --cache-from="$REGISTRY/$REPOSITORY:latest" \
+              --label=org.opencontainers.image.title='Anserno Server' \
+              --label=org.opencontainers.image.created="$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
+              --label=org.opencontainers.image.authors='XzJe <contact@xz.je>' \
+              --label=org.opencontainers.image.url='https://github.com/zellio/anserno' \
+              --label=org.opencontainers.image.documentation='https://github.com/zellio/anserno/blob/main/README.md' \
+              --label=org.opencontainers.image.source='https://github.com/zellio/anserno' \
+              --label=org.opencontainers.image.version='0.1.0' \
+              --label=org.opencontainers.image.licenses="BSD-3-Clause" \
+              --tag="$REGISTRY/$REPOSITORY:${IMAGE_TAG:12}" \
+              --tag="$REGISTRY/$REPOSITORY:${GITHUB_REF##*/}" \
+              --build-arg=BUILDKIT_INLINE_CACHE=1 \
+              --target=image \
+              "$(pwd)"
+
+          docker push "$REGISTRY/$REPOSITORY:${IMAGE_TAG:12}"
+          docker push "$REGISTRY/$REPOSITORY:${GITHUB_REF##*/}"
+      -
+        if: github.ref == 'refs/heads/main'
+        name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::648729606310:role/anserno-uploader
+          role-session-name: ecr-uploader
+          aws-region: us-east-1
+      -
+        if: github.ref == 'refs/heads/main'
+        name: Deploy new image to ECS
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: my-ecr-repo
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws ecs update-service --cluster primary --service anserno --force-new-deployment

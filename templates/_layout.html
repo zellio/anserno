@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+          integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls"
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css"
+          integreity="sha512-CCCLMVkN2BjfasRRbOIGDKhZa7gdWD93ttxHs0Z2UJB+jSqGPTcM4tibmV3GLxO2YkToFwsI36ivMvHw1KX+pg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="/static/style/style.css" />
+    {% block style %}{% endblock %}
+    {% block head_script %}{% endblock %}
+    <title>{% block title %}Anserno{% endblock %}</title>
+  </head>
+  <body class="layout">
+    <div class="container layout-container">
+      <header class="layout-header"></header>
+      <nav class="layout-nav pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/">
+              <i class="fa-solid fa-house"></i>
+              <span class="site-header-name">Anserno</span>
+            </a>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/books">
+              <i class="fas fa-fw fa-book me-2"></i>
+              <span>Books</span>
+            </a>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/authors">
+              <i class="fas fa-fw fa-user me-2"></i>
+              <span>Authors</span>
+            </a>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="/series">
+              <i class="fas fa-fw fa-inbox me-2"></i>
+              <span>Series</span>
+            </a>
+          </li>
+        </ul>
+        <ul class="layout-nav-search pure-menu-list pure-form">
+          <li class="pure-menu-item">
+            <input form="search-form" name="query" placeholder="search" required=true />
+          </li>
+          <li class="pure-menu-item">
+            <button id="search-button" form="search-form" class="pure-menu-link search-botton" href="/search">
+              <i class="fas fa-fw fa-magnifying-glass me-2"></i>
+              <span>Search</span>
+            </input>
+          </li>
+        </ul>
+      </nav>
+      <main class="layout-main">
+        {% block main %}{% endblock %}
+      </main>
+      <footer class="layout-footer pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="https://github.com/zellio/anserno">
+              <i class="fab fa-fw fa-github"></i>
+              <span hidden-mobile>Github Project</span>
+            </a>
+          </li>
+          <li class="pure-menu-item">
+            <a class="pure-menu-link" href="https://github.com/zellio/anserno/issues">
+              <i class="fas fa-fw fa-bug"></i>
+              <span hidden-mobile>Issues</span>
+            </a>
+          </li>
+        </ul>
+      </footer>
+    </div>
+    <form id="search-form" name="search" rel="search" method="get" action="/search" target="_self"></form>
+  </body>
+  {% block script %}{% endblock %}
+</html>

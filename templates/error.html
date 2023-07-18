@@ -1,0 +1,18 @@
+{% import "_macros.html" as macro %}
+
+{% extends "_layout.html" %}
+
+{% block title %}
+{{ super() }}{% if title %}: {{ title }}{% endif %}
+{% endblock %}
+
+{% block main %}
+<div class="error-panel">
+  <header>
+    <h1>Something went wrong: {{ status }} Error</h1>
+  </header>
+  <p>
+    {{ error }}
+  </p>
+</div>
+{% endblock %}
