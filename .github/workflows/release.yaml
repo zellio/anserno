@@ -1,0 +1,53 @@
+---
+name: Publish Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish-release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-target:
+          - toolchain: stable
+            target: aarch64-unknown-linux-gnu
+          - toolchain: stable
+            target: aarch64-unknown-linux-musl
+          - toolchain: stable
+            target: x86_64-unknown-linux-gnu
+          - toolchain: stable
+            target: x86_64-unknown-linux-musl
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.build-target.toolchain }}
+          profile: minimal
+          override: true
+          target: ${{ matrix.build-target.target }}
+      - name: Build Target
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --bin anserno-server --target ${{ matrix.build-target.target }}
+      - name: Package
+        run: |-
+          mv target/${{ matrix.build-target.target}}/release/anserno-server anserno-server-${{ matrix.build-target.target }}
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'anserno-server-*'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
