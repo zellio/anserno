@@ -1,0 +1,64 @@
+#reader-source-url-path {
+    display: none!important;
+}
+
+
+.layout-main,
+#display-panel
+{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    position: relative;
+    background-color: var(--color-white);
+}
+
+#display-panel,
+#display-panel > div {
+    flex: 1 0;
+    align-self: stretch;
+}
+
+
+.arrow {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 4rem;
+    justify-content: center;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    user-select: none;
+    width: 35%;
+    z-index: 10;
+    transition: opacity 0.2s ease-in-out;
+    height: 100%;
+}
+
+#prev.arrow {
+    left: 0;
+}
+
+#next.arrow {
+    right: 0;
+}
+
+#toc {
+    text-align: center;
+    z-index: 20;
+    margin-bottom: 1em;
+}
+
+#toc-selector {
+    max-width: 100%;
+}
+
+
+#controls .pure-menu-list {
+    display: flex;
+    justify-content: space-around;
+    z-index: 10;
+}

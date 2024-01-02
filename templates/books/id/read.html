@@ -1,0 +1,59 @@
+{% import "_macros.html" as macro %}
+{% extends "_layout.html" %}
+
+{% block head_script %}
+{{ macro::include_jquery() }}
+
+<link rel="stylesheet" href="/static/style/reader.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<script src="https://unpkg.com/epubjs@0.3.93/dist/epub.min.js"
+        integrity="sha512-qZUwAZnQNbTGK3xweH0p9dJ0/FflhdJwGr5IhvhuBtltqdTi6G8TjsAf8WINe3uhhyt2wueXacvXtQtOiHm26Q=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block title %}
+{{ super() }}: Read - {{ flat_book.title }}
+{% endblock %}
+
+{% block main %}
+<a id="reader-source-url-path" href="/books/{{ flat_book.id }}/download/epub"></a>
+<div id="prev" class="arrow"><i class="fa fa-fw fa-chevron-left" ></i></div>
+<div id="toc"></div>
+<div id="display-panel"></div>
+<div id="next" class="arrow"><i class="fa fa-fw fa-chevron-right" ></i></div>
+
+<nav id="controls">
+  <ul class="pure-menu-list">
+    <li id="prev-chapter" class="pure-menu-item">
+      <div class="pure-menu-link">
+        <i class="fa-solid fa-angles-left"></i>
+      </div>
+    </li>
+    <li id="prev-page" class="pure-menu-item">
+      <div class="pure-menu-link">
+        <i class="fa-solid fa-angle-left"></i>
+      </div>
+    </li>
+    <li id="next-page" class="pure-menu-item">
+      <div class="pure-menu-link">
+        <i class="fa-solid fa-angle-right"></i>
+      </div>
+    </li>
+    <li id="next-chapter" class="pure-menu-item">
+      <div class="pure-menu-link">
+        <i class="fa-solid fa-angles-right"></i>
+      </div>
+    </li>
+  </ul>
+</nav>
+{% endblock %}
+
+{% block script %}
+<script blocking="render" src="/static/script/reader.js"></script>
+{% endblock %}
