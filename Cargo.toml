@@ -13,6 +13,7 @@ actix-web = "4.4.1"
 async-trait = "0.1.76"
 clap = { version = "4.4.12", features = ["env", "derive", "unicode"] }
 derive_builder = { version = "0.12.0", features = ["clippy"] }
+itertools = "0.12.1"
 reqwest = { version = "0.11.23", features = ["rustls-tls"], default-features = false }
 sea-orm = { version = "0.12.10", features = ["runtime-actix", "sqlx-sqlite", "runtime-actix-rustls"] }
 serde = "1.0.193"

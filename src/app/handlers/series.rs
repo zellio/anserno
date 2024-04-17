@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use itertools::Itertools;
 
 use actix_web::{web, HttpResponse, Responder};
 use sea_orm::{EntityTrait, LoaderTrait, ModelTrait, PaginatorTrait, QueryOrder};
@@ -42,9 +43,17 @@ pub async fn get(
         .await
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;
 
-    let flat_books = series
+    let flat_books : Vec<Vec<flat_books::Model>> = series
         .load_many_to_many(flat_books::Entity, books_series_link::Entity, conn)
         .await
+        .map(|r| r.into_iter()
+                  .map(|series|
+                       series
+                       .into_iter()
+                       .sorted_by(|x, y|
+                                  x.series_index.partial_cmp(&y.series_index).unwrap())
+                       .collect())
+                  .collect())
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;
 
     let series_flat_books: HashMap<i32, Vec<flat_books::Model>> = series
