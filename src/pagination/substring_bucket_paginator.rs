@@ -69,10 +69,12 @@ where
     }
 
     fn selector<E: EntityTrait>(&self, query: Select<E>) -> Select<E> {
-        query.filter(
-            self.bucket_column
-                .starts_with(self.buckets.get(self.offset).unwrap()),
-        )
+        query
+            .filter(
+                self.bucket_column
+                    .starts_with(self.buckets.get(self.offset).unwrap()),
+            )
+            .order_by_asc(self.bucket_column)
     }
 }
 

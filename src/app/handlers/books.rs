@@ -29,6 +29,7 @@ pub async fn get(
 
     let flat_books = paginator
         .selector(flat_books::Entity::find().order_by_desc(flat_books::Column::Id))
+        .order_by_asc(flat_books::Column::Sort)
         .all(conn)
         .await
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;

@@ -42,10 +42,14 @@ pub async fn get(
         .await
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;
 
-    let flat_books = authors
+    let mut flat_books = authors
         .load_many_to_many(flat_books::Entity, books_authors_link::Entity, conn)
         .await
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;
+
+    for books in flat_books.iter_mut() {
+        books.sort_by(|left, right| left.sort.cmp(&right.sort));
+    }
 
     let authors_flat_books: HashMap<i32, Vec<flat_books::Model>> = authors
         .iter()

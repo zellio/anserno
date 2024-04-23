@@ -51,6 +51,7 @@ pub async fn get(
 
     let flat_books = flat_books::Entity::find()
         .filter(flat_books::Column::Id.is_in(book_ids))
+        .order_by_asc(flat_books::Column::Sort)
         .all(conn)
         .await
         .map_err(|err| AnsernoError::from(err).with_context(&ctx))?;
