@@ -1,0 +1,12 @@
+[package]
+name = "pagination"
+edition = "2021"
+version.workspace = true
+authors.workspace = true
+description = ""
+
+[dependencies]
+serde = { version = "1.0.217", optional = true, features = ["serde_derive"] }
+
+[features]
+serde = ["dep:serde"]

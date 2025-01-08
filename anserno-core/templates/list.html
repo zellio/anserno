@@ -1,0 +1,15 @@
+{% import "_macros.html" as macro %}
+
+{% extends "_layout.html" %}
+
+{% block title %}
+{{ super() }}{% if title %}: {{ title }}{% endif %}
+{% endblock %}
+
+{% block main %}
+{{ macro::flat_books_panel(flat_books = flat_books) }}
+
+{% if paginator %}
+{{ macro::pagination(url = url, paginator = paginator, series = paginator_series, page = paginator_page, items = paginator_items) }}
+{% endif %}
+{% endblock %}

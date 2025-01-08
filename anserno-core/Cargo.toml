@@ -1,0 +1,19 @@
+[package]
+name = "anserno-core"
+edition = "2021"
+version.workspace = true
+authors.workspace = true
+description = ""
+
+[dependencies]
+actix-files = "0.6.6"
+actix-web = { version = "4.9.0", default-features = false, features = ["unicode", "macros"] }
+calibre-data = { path = "../calibre-data", features = ["hal"] }
+derive_builder = { version = "0.20.2" }
+hypertext-application-language = { path = "../hypertext-application-language" }
+pagination = { path = "../pagination", features = [ "serde" ] }
+sea-orm = { version = "1.1.3", default-features = false, features = [ "macros", "with-chrono", "with-rust_decimal", "with-json", "with-time", "runtime-tokio", "sqlx", "sqlx-sqlite" ] }
+serde = { version = "1.0.217", features = ["serde_derive"] }
+serde_json = { version = "1.0.134" }
+tera = { version = "1.20.0" }
+url = "2.5.4"

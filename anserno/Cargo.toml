@@ -1,0 +1,18 @@
+[package]
+name = "anserno"
+edition = "2021"
+version.workspace = true
+authors.workspace = true
+description = ""
+
+[dependencies]
+actix-web = { version = "4.9.0", default-features = false, features = ["macros", "unicode"] }
+anserno-core = { path = "../anserno-core" }
+clap = { version = "4.5.23", features = [ "derive", "env", "unicode" ] }
+tokio = { version = "1.42.0", features = [ "macros", "rt-multi-thread" ] }
+tracing = { version = "0.1.41" }
+tracing-actix-web = { version = "0.7.15" }
+tracing-subscriber = { version = "0.3.19", features = [ "json", "env-filter" ] }
+calibre-data = { path = "../calibre-data" }
+url = "2.5.4"
+tera = "1.20.0"

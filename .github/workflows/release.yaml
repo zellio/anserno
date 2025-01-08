@@ -26,28 +26,40 @@ jobs:
             target: x86_64-unknown-linux-musl
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.build-target.toolchain }}
-          profile: minimal
-          override: true
-          target: ${{ matrix.build-target.target }}
-      - name: Build Target
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --bin anserno-server --target ${{ matrix.build-target.target }}
-      - name: Package
+          targets: ${{ matrix.build-target.target }}
+      - name: Install cross
+        run: >-
+          cargo install cross
+      - name: Fetch rust dependencies
+        run: >-
+          cargo fetch --target ${{ matrix.build-target.target }}
+      - name: Build release
+        run: >-
+          cross build --release --target ${{ matrix.build-target.target }} --bin anserno
+      - name: Package release
         run: |-
-          mv target/${{ matrix.build-target.target}}/release/anserno-server anserno-server-${{ matrix.build-target.target }}
-      - name: Publish
-        uses: softprops/action-gh-release@v1
+          set -o errexit -o nounset -o pipefail -o xtrace
+
+          mkdir release
+
+          cp target/${{ matrix.build-target.target }}/release/anserno release/anserno-${{ matrix.build-target.target }}
+
+          tar --create --directory anserno-core static templates --file - | gzip >release/anserno-assets.tar.gz
+
+          cd release || exit 1
+
+          sha256sum anserno-${{ matrix.build-target.target }} >anserno-${{ matrix.build-target.target }}.sha256sum
+          sha256sum anserno-assets.tar.gz >anserno-assets.tar.gz.sha256sum
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
         with:
-          files: 'anserno-server-*'
+          files: 'release/*'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

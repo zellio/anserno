@@ -1,0 +1,166 @@
+{% macro include_jquery() %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.slim.js"
+        integrity="sha512-JC/KiiKXoc40I1lqZUnoRQr96y5/q4Wxrq5w+WKqbg/6Aq0ivpS2oZ24x/aEtTRwxahZ/KOApxy8BSZOeLXMiA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+{% endmacro include_jquery %}
+
+
+{% macro flat_book_authors_list(flat_book) %}
+{% for author_id, author_name in flat_book.authors %}
+{% if loop.first %}By: {% endif %}<a href="/authors/{{ author_id }}">{{ author_name }}</a>{% if not loop.last %},{% endif %}
+{% endfor %}
+{% endmacro flat_book_authors_list %}
+
+
+{% macro flat_book_series_list(flat_book) %}
+{% for series_id, series_name in flat_book.series %}
+{% if loop.first %}From: {% endif %}<a href="/series/{{ series_id }}">{{ series_name }} [{{ flat_book.series_index }}]</a>{% if not loop.last %},{% endif %}
+{% endfor %}
+{% endmacro flat_book_series_list %}
+
+
+{% macro flat_book_downloads_list(flat_book) %}
+{% for format, _ in flat_book.formats %}
+<a class="button" href="/books/{{ flat_book.id }}/download/{{ format | lower }}">{{ format }}</a>
+{% endfor %}
+{% endmacro book_authors_list %}
+
+
+{% macro flat_books_panel(flat_books) %}
+<div class="flat-books-panel">
+  {% for flat_book in flat_books %}
+  <div class="flat-books-panel-column">
+    <section class="card flat-books-panel-card">
+      <figure class="flat-books-panel-media">
+        <a href="/books/{{ flat_book.id }}">
+          <img src="/books/{{ flat_book.id }}/thumb" alt="{{ flat_book.title }} Covert Thumbnail" />
+        </a>
+      </figure>
+      <div class="flat-books-panel-content">
+        <h3>{{ flat_book.title }}</h3>
+        {% if flat_book.authors %}<p class="ellipsis-overflow">{{ macro::flat_book_authors_list(flat_book = flat_book) }}</p>{% endif %}
+        {% if flat_book.series %}<p class="ellipsis-overflow">{{ macro::flat_book_series_list(flat_book = flat_book) }}</p>{% endif %}
+      </div>
+    </section>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro flat_books_panel %}
+
+
+{% macro flat_books_container_panel(url, container, flat_books_map) %}
+<div class="flat-books-container-panel">
+  {% for model in container %}
+  <div class="flat-books-container-list">
+    <header id="flat-books-container-list-header-{{ model.name | slugify }}" class="flat-books-container-list-header card">
+      <h2><a href="{{ url }}/{{ model.id }}">{{ model.name }}</a></h2>
+      <a class="collapsible-arrow selected" href="#{{ model.name | slugify }}-card" data-action="collapse" data-target="flat-books-container-list-content-{{ model.name | slugify }}">
+        <i class="fas fa-angle-down" aria-hidden="true"></i>
+      </a>
+    </header>
+    <section id="flat-books-container-list-content-{{ model.name | slugify }}" class="flat-books-container-list-content">
+      {{ macro::flat_books_container_panel_list(flat_books = flat_books_map[model.id]) }}
+    </section>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro flat_books_container_panel %}
+
+
+{% macro flat_books_container_panel_list(flat_books) %}
+{% for flat_book in flat_books %}
+<section class="flat-books-container-list-item card">
+  <figure class="flat-books-container-list-item-media">
+    <a href="/books/{{ flat_book.id }}">
+      <img src="/books/{{ flat_book.id }}/thumb" alt="{{ flat_book.title }} Covert Thumbnail" />
+    </a>
+  </figure>
+  <div class="flat-books-container-list-item-body">
+    <header class="flat-books-container-list-item-header">
+      <h3>{{ flat_book.title }}</h3>
+      <div>
+        {% if flat_book.authors %}
+        <p>{{ macro::flat_book_authors_list(flat_book = flat_book) }}</p>
+        {% endif %}
+        {% if flat_book.series %}
+        <p>{{ macro::flat_book_series_list(flat_book = flat_book) }}</p>
+        {% endif %}
+      </div>
+    </header>
+    <section class="flat-books-container-list-item-content" hidden-mobile>
+      {{ flat_book.description | safe }}
+    </section>
+  </div>
+</section>
+{% endfor %}
+{% endmacro %}
+
+
+{% macro pagination(url, paginator, series, page, items) %}
+<nav class="pagination pure-menu pure-menu-horizontal" role="navigation" aria-label="pagination">
+  {% if page.previous %}
+  <a class="pure-menu-link pagination-previous pagination-list-item-link" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ page.previous }}" aria-label="previous page" />
+  {% else %}
+  <a class="pure-menu-link pagination-previous pagination-list-item-link pure-menu-disabled">
+  {% endif %}
+    Prev
+  </a>
+  {% if page.next %}
+  <a class="pure-menu-link pagination-next pagination-list-item-link" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ page.next }}" aria-label="next page" />
+  {% else %}
+  <a class="pure-menu-link pagination-next pagination-list-item-link pure-menu-disabled" disabled>
+  {% endif %}
+    Next
+  </a>
+  <ul class="pagination-list pure-menu-list">
+    {% for entry in series %} {% for type, value in entry %}
+    {% if type == "Gap" %}
+    <li class="pagination-list-item pure-menu-item" hidden-mobile>
+      <span class="pagination-list-gap">&hellip;</span>
+    {% else %} {% if type == "Selected" %}
+    <li class="pagination-list-item pure-menu-item">
+      <a class="pagination-list-item-link pure-menu-link" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ value }}{% if items != 0 %}&items={{ items }}{% endif %}" selected>
+    {% elif type == "Sentinel" %}
+    <li class="pagination-list-item pure-menu-item" hidden-mobile>
+      <a class="pagination-list-item-link pure-menu-link" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ value }}{% if items != 0 %}&items={{ items }}{% endif %}
+                                                                                                    ">
+    {% elif type == "Page" %}
+    <li class="pagination-list-item pure-menu-item" hidden-tablet>
+      <a class="pagination-list-item-link pure-menu-link" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ value }}{% if items != 0 %}&items={{ items }}{% endif %}">
+    {% endif %}
+      {% set offset = value - 1 %}
+      {{ paginator.buckets[offset] | default(value = value) }}
+      </a>
+      {% endif %}
+    </li>
+    {% endfor %} {% endfor %}
+  </ul>
+</nav>
+{% endmacro pagination %}
+
+
+{% macro jump_paginator(url, paginator, series, page) %}
+<noscript>
+  <style>.jump-menu { display: none!important }</style>
+  <form class="jump-pagination pure-form">
+    <label class="jump-pagination-label" for="page">Jump to: </label>
+    <select class="jump-pagination-select select" name="page" id="jump-paginator">
+      {% for str in paginator["buckets"] %}
+      <option class="jump-pagination-option" value="{{ loop.index }}">{{ str }}</option>
+      {% endfor %}
+    </select>
+    <button class="jump-pagination-button" type="submit">Submit</button>
+  </form>
+</noscript>
+<div class="jump-menu">
+  <a class="jump-menu-button button" data-action="collapse" data-target="jump-menu-grid-container" href="#">Jump Menu</a>
+  <div id="jump-menu-grid-container">
+  <div id="jump-menu-grid" class="jump-menu-grid card">
+    {% for value in paginator["buckets"] %}
+    <a class="jump-menu-grid-button button" href="{{ url }}{% if url is containing("?") %}&{% else %}?{% endif %}page={{ loop.index }}">{{ value }}</a>
+    {% endfor %}
+  </div>
+  </div>
+</div>
+{% endmacro %}
