@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{http::header::ContentType, web, HttpResponse, Responder};
 use calibre_data::{entities::flat_books, library::CalibreLibrary};
 use sea_orm::{
     sea_query::{Func, SimpleExpr},
@@ -11,7 +11,7 @@ use crate::{
     url_params::Pagination,
 };
 
-#[actix_web::get("")]
+#[actix_web::get("/")]
 pub async fn get(
     ctx: web::Data<Context>,
     pagination: web::Query<Pagination>,
@@ -35,8 +35,12 @@ pub async fn get(
         .map_err(|err| err.with_context(&ctx))
 }
 
-pub fn service() -> actix_web::Scope {
-    actix_web::Scope::new("/").service(get)
+#[actix_web::get("/robots.txt")]
+pub async fn get_robots_txt() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .insert_header(("cache-control", "no-cache"))
+        .body(["User-agent: *", "Disallow: /"].join("\r\n"))
 }
 
 pub async fn default_service(ctx: web::Data<Context>) -> ResponseResult<impl Responder> {

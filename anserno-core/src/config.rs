@@ -7,9 +7,10 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(api::service())
         .service(authors::service())
         .service(books::service())
-        .service(index::service())
         .service(search::service())
         .service(series::service())
         .service(static_files::service())
+        .service(index::get)
+        .service(index::get_robots_txt)
         .default_service(web::to(index::default_service));
 }
